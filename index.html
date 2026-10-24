@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book a meeting</title>
+<style>
+:root{color-scheme:light;--brand:#6264a7;--brand-dark:#464775;--ink:#242424;
+      --muted:#616161;--border:#d1d1d1;--canvas:#f5f5f5;--focus:#5b5fc7;--soft:#f7f7fb}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:32px 16px;display:flex;justify-content:center;
+     align-items:center;font-family:"Segoe UI",system-ui,sans-serif;color:var(--ink);
+     background:var(--canvas)}
+.shell{width:min(100%,760px)}
+.brand{display:flex;align-items:center;gap:10px;margin:0 0 16px 4px;font-size:14px;
+       font-weight:600;color:#424242}
+.brand-mark{display:grid;place-items:center;width:28px;height:28px;border-radius:6px;
+            color:#fff;background:var(--brand);font-size:13px;font-weight:700;letter-spacing:-1px}
+.card{overflow:hidden;background:#fff;border:1px solid #e1e1e1;border-radius:8px;
+      box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.head{padding:28px 32px 25px;color:#fff;background:var(--brand)}
+.eyebrow{margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.04em;
+          text-transform:uppercase;opacity:.9}
+.head h1{margin:0;font-size:24px;line-height:1.25;font-weight:600;letter-spacing:-.2px}
+.head p{margin:8px 0 0;font-size:14px;line-height:1.45;color:#f5f5f5}
+.body{padding:28px 32px 30px}
+.section-title{margin:0 0 20px;font-size:16px;font-weight:600}
+.field{margin-top:18px}
+.field:first-of-type{margin-top:0}
+label{display:block;margin:0 0 6px;font-size:14px;font-weight:600}
+.hint{margin:0 0 7px;font-size:12px;color:var(--muted)}
+input{width:100%;height:40px;padding:0 12px;border:1px solid var(--border);
+      border-radius:4px;color:var(--ink);background:#fff;font:inherit;font-size:14px}
+input:focus{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--focus)}
+input[readonly]{color:#424242;background:#f8f8f8}
+.booking{display:grid;grid-template-columns:minmax(300px,1.15fr) minmax(220px,.85fr);
+         gap:32px;margin-top:26px}
+.booking h3{margin:0 0 16px;font-size:15px;font-weight:600}
+.calendar{min-width:0}
+.month-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.month{font-size:15px;font-weight:600}
+.month-nav{display:flex;gap:4px}
+.nav-btn{width:30px;height:30px;padding:0;border:1px solid var(--border);border-radius:50%;
+         color:var(--brand-dark);background:#fff;font-size:18px;line-height:1;cursor:pointer}
+.nav-btn:hover{background:var(--soft)}
+.nav-btn:focus-visible,.day:focus-visible,.slot:focus-visible,.duration:focus-visible{
+  outline:2px solid var(--focus);outline-offset:2px}
+.weekdays,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.weekdays{margin-bottom:6px;color:var(--muted);font-size:11px;font-weight:600}
+.day{min-height:36px;border:1px solid transparent;border-radius:50%;color:var(--ink);
+     background:#fff;font:inherit;font-size:13px;cursor:pointer}
+.day:hover:not(:disabled){border-color:var(--brand);color:var(--brand-dark)}
+.day.selected{color:#fff;background:var(--brand)}
+.day.muted{color:#b7b7b7}
+.day:disabled{color:#bdbdbd;background:#fafafa;cursor:not-allowed}
+.timezone{margin:17px 0 0;color:var(--muted);font-size:12px}
+.timezone strong{color:#424242;font-weight:600}
+.availability{border-left:1px solid #e5e5e5;padding-left:32px}
+.selected-date{margin:-3px 0 14px;color:var(--muted);font-size:12px}
+.selected-date strong{display:block;margin-top:3px;color:var(--ink);font-size:14px}
+.slots{display:grid;gap:8px;max-height:250px;overflow:auto;padding:2px 4px 2px 0}
+.slot{min-height:38px;padding:8px 12px;border:1px solid #a9a9d2;border-radius:4px;
+      color:var(--brand-dark);background:#fff;font:600 13px "Segoe UI",system-ui,sans-serif;
+      cursor:pointer}
+.slot:hover,.slot.selected{color:#fff;background:var(--brand);border-color:var(--brand)}
+.duration-wrap{margin-top:26px}
+.durations{display:flex;gap:8px}
+.duration{flex:1;min-height:38px;padding:8px 10px;border:1px solid var(--border);
+          border-radius:4px;color:#424242;background:#fff;font:600 13px "Segoe UI",system-ui,sans-serif;
+          cursor:pointer}
+.duration:hover,.duration.selected{border-color:var(--brand);color:var(--brand-dark);background:var(--soft)}
+.client-details{margin-top:28px;padding-top:24px;border-top:1px solid #e5e5e5}
+.client-details h3{margin:0 0 6px;font-size:15px;font-weight:600}
+.client-details .description{margin:0 0 16px;color:var(--muted);font-size:12px;line-height:1.5}
+.client-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.client-field label{margin-bottom:6px}
+.client-field input{height:42px}
+.required{color:var(--brand-dark)}
+.summary{display:flex;gap:10px;margin-top:24px;padding:12px;border-radius:4px;
+         color:#424242;background:#f5f5f5;font-size:12px;line-height:1.45}
+.summary-icon{flex:0 0 auto;color:var(--brand);font-size:16px;line-height:1}
+.btn{display:block;width:100%;margin-top:24px;padding:11px 16px;border:0;border-radius:4px;
+     color:#fff;background:var(--brand-dark);font:600 14px "Segoe UI",system-ui,sans-serif;
+     text-align:center;text-decoration:none;cursor:pointer;transition:background .15s ease}
+.btn:hover{background:#35364f}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.note{margin:16px 0 0;color:var(--muted);font-size:12px;line-height:1.5;text-align:center}
+@media(max-width:640px){body{padding:16px 12px}.head,.body{padding-left:22px;padding-right:22px}
+  .booking{grid-template-columns:1fr;gap:28px}.availability{border:0;border-top:1px solid #e5e5e5;
+  padding:24px 0 0}.slots{max-height:none;grid-template-columns:repeat(2,1fr)}
+  .client-grid{grid-template-columns:1fr;gap:16px}}
+@media(max-width:380px){.durations{flex-direction:column}.slots{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <section class="card" aria-labelledby="page-title">
+    <header class="head">
+      <p class="eyebrow">Schedule a conversation</p>
+      <h1 id="page-title">Book a meeting with Adam Lentz</h1>
+      <p>Chief Development Officer · Go Store It</p>
+    </header>
+    <div class="body">
+      <h2 class="section-title">Meeting details</h2>
+      <div class="field">
+        <label for="topic">Meeting topic</label>
+        <input id="topic" value="Q3 Project Sync" readonly>
+      </div>
+      <div class="booking">
+        <div class="calendar">
+          <h3>Select a date</h3>
+          <div class="month-bar">
+            <span class="month" id="month-label">October 2026</span>
+            <div class="month-nav">
+              <button class="nav-btn" id="previous-month" type="button" aria-label="Previous month">‹</button>
+              <button class="nav-btn" id="next-month" type="button" aria-label="Next month">›</button>
+            </div>
+          </div>
+          <div class="weekdays" aria-hidden="true">
+            <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
+          </div>
+          <div class="days" id="calendar-days" role="group" aria-label="Available dates"></div>
+          <p class="timezone">Time zone: <strong>United Kingdom Time</strong></p>
+        </div>
+        <div class="availability">
+          <h3>Friday, October 30</h3>
+          <p class="selected-date">Available times <strong>All times shown in your time zone</strong></p>
+          <div class="slots" id="time-slots" role="group" aria-label="Available times">
+            <button class="slot selected" type="button">10:00 AM</button>
+            <button class="slot" type="button">10:30 AM</button>
+            <button class="slot" type="button">11:00 AM</button>
+            <button class="slot" type="button">11:30 AM</button>
+            <button class="slot" type="button">2:00 PM</button>
+            <button class="slot" type="button">2:30 PM</button>
+            <button class="slot" type="button">4:00 PM</button>
+            <button class="slot" type="button">4:30 PM</button>
+          </div>
+        </div>
+      </div>
+      <div class="duration-wrap">
+        <h3>How long do you need?</h3>
+        <div class="durations" role="group" aria-label="Meeting duration">
+          <button class="duration selected" type="button">30 minutes</button>
+          <button class="duration" type="button">45 minutes</button>
+          <button class="duration" type="button">60 minutes</button>
+        </div>
+      </div>
+      <section class="client-details" aria-labelledby="client-details-title">
+        <h3 id="client-details-title">Your details</h3>
+        <p class="description">Share a few details so Adam knows who is joining the meeting.</p>
+        <div class="client-grid">
+          <div class="client-field">
+            <label for="client-name">Full name <span class="required" aria-hidden="true">*</span></label>
+            <input id="client-name" name="clientName" type="text" autocomplete="name"
+                   placeholder="e.g. Alex Morgan" required>
+          </div>
+          <div class="client-field">
+            <label for="client-role">Role <span class="required" aria-hidden="true">*</span></label>
+            <input id="client-role" name="clientRole" type="text" autocomplete="organization-title"
+                   placeholder="e.g. Product Manager" required>
+          </div>
+        </div>
+      </section>
+      <div class="summary">
+        <span class="summary-icon" aria-hidden="true">i</span>
+        <span>A Teams meeting link will be added to the calendar invitation.</span>
+      </div>
+      <a class="btn" href="">Confirm booking</a>
+      <p class="note">You’ll review the details before the meeting is added to your calendar.</p>
+    </div>
+  </section>
+</main>
+<script>
+  const monthLabel = document.getElementById("month-label");
+  const calendarDays = document.getElementById("calendar-days");
+  const selectedDateLabel = document.querySelector(".availability h3");
+  const monthNames = ["January","February","March","April","May","June",
+    "July","August","September","October","November","December"];
+  let visibleMonth = new Date(2026, 9, 1);
+  let selectedDate = new Date(2026, 9, 30);
+
+  function renderCalendar() {
+    const year = visibleMonth.getFullYear();
+    const month = visibleMonth.getMonth();
+    monthLabel.textContent = monthNames[month] + " " + year;
+    calendarDays.innerHTML = "";
+    const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let index = 0; index < firstDay; index += 1) {
+      const blank = document.createElement("span");
+      blank.setAttribute("aria-hidden", "true");
+      calendarDays.appendChild(blank);
+    }
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const button = document.createElement("button");
+      const date = new Date(year, month, day);
+      const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+      button.className = "day" + (date.toDateString() === selectedDate.toDateString() ? " selected" : "");
+      button.type = "button";
+      button.textContent = day;
+      button.disabled = isWeekend;
+      button.setAttribute("aria-label", date.toDateString() + (isWeekend ? ", unavailable" : ""));
+      button.addEventListener("click", function () {
+        selectedDate = date;
+        selectedDateLabel.textContent = date.toLocaleDateString("en-GB", {
+          weekday: "long", month: "long", day: "numeric"
+        });
+        renderCalendar();
+      });
+      calendarDays.appendChild(button);
+    }
+  }
+
+  document.getElementById("previous-month").addEventListener("click", function () {
+    visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+  document.getElementById("next-month").addEventListener("click", function () {
+    visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1);
+    renderCalendar();
+  });
+  document.querySelectorAll(".slot, .duration").forEach(function (button) {
+    button.addEventListener("click", function () {
+      button.parentElement.querySelectorAll("button").forEach(function (item) {
+        item.classList.remove("selected");
+      });
+      button.classList.add("selected");
+    });
+  });
+  renderCalendar();
+</script>
+</body>
+</html>
